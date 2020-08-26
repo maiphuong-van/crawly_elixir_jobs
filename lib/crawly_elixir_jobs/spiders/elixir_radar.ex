@@ -44,6 +44,11 @@ defmodule ElixirRadar do
       |> Floki.find(".job-board-job-title")
       |> parse()
 
+    link =
+      job
+      |> Floki.find(".job-board-job-title")
+      |> Floki.attribute("a", "href")
+
     location =
       job
       |> Floki.find(".job-board-job-location")
@@ -54,7 +59,7 @@ defmodule ElixirRadar do
       |> Floki.find(".job-board-job-description")
       |> parse()
 
-    %{title: title, location: location, description: description}
+    %{title: title, location: location, description: description, link: link}
   end
 
   defp parse(text) do
