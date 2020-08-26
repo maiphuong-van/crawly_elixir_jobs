@@ -28,9 +28,10 @@ defmodule ElixirRadar do
       |> Enum.map(&build_absolute_url/1)
       |> Enum.map(&Crawly.Utils.request_from_url/1)
 
-    jobs = document |> Floki.find(".job-board-job-details")
-
-    items = jobs |> Enum.map(&create_item/1)
+    items =
+      document
+      |> Floki.find(".job-board-job-details")
+      |> Enum.map(&create_item/1)
 
     %Crawly.ParsedItem{:items => items, :requests => requests}
   end
@@ -43,17 +44,17 @@ defmodule ElixirRadar do
       |> Floki.find(".job-board-job-title")
       |> parse()
 
-    description =
-      job
-      |> Floki.find(".job-board-job-description")
-      |> parse()
-
     location =
       job
       |> Floki.find(".job-board-job-location")
       |> parse()
 
-    %{title: title, description: description, location: location}
+    description =
+      job
+      |> Floki.find(".job-board-job-description")
+      |> parse()
+
+    %{title: title, location: location, description: description}
   end
 
   defp parse(text) do
