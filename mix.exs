@@ -23,7 +23,8 @@ defmodule CrawlyElixirJobs.MixProject do
   defp deps do
     [
       {:crawly, "~> 0.10.0"},
-      {:floki, "~> 0.26.0"}
+      {:floki, "~> 0.26.0"},
+      {:erlang_node_discovery, git: "https://github.com/oltarasenko/erlang-node-discovery"}
     ]
   end
 end
