@@ -10,7 +10,7 @@ defmodule AmazonDrawing do
   def init() do
     [
       start_urls: [
-        "https://www.amazon.de/s?k=Drawing&ref=nb_sb_noss"
+        "https://www.amazon.de//s?k=drawing&qid=1598531843"
       ]
     ]
   end
@@ -19,11 +19,22 @@ defmodule AmazonDrawing do
   def parse_item(response) do
     {:ok, document} = Floki.parse_document(response.body)
 
+    urls =
+      document
+      |> Floki.find(".a-pagination")
+      |> Floki.find(".a-normal")
+      |> Floki.attribute("a", "href")
+
+    requests =
+      urls
+      |> Enum.uniq()
+      |> Enum.map(&build_request/1)
+
     [{_, _, result_blocks}] = Floki.find(document, "div.s-main-slot")
 
     items = Enum.map(result_blocks, &parse_result/1)
 
-    %Crawly.ParsedItem{:items => items, :requests => []}
+    %Crawly.ParsedItem{:items => items, :requests => requests}
   end
 
   defp parse_result(item) do
@@ -45,5 +56,11 @@ defmodule AmazonDrawing do
     else
       %{}
     end
+  end
+
+  defp build_request(url) do
+    url
+    |> Crawly.Utils.build_absolute_url(base_url())
+    |> Crawly.Utils.request_from_url()
   end
 end
