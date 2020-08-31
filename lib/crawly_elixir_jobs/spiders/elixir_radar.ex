@@ -2,6 +2,18 @@ defmodule ElixirRadar do
   use Crawly.Spider
 
   @impl Crawly.Spider
+  def override_settings() do
+    pipelines = [
+      {Crawly.Pipelines.Validate, fields: [:title, :location]},
+      CrawlyElixirJobs.Pipleline.Filter,
+      Crawly.Pipelines.JSONEncoder,
+      {Crawly.Pipelines.WriteToFile, folder: "/tmp", extension: "jl"}
+    ]
+
+    [pipelines: pipelines]
+  end
+
+  @impl Crawly.Spider
   def base_url(), do: "https://elixir-radar.com"
 
   @impl Crawly.Spider
@@ -44,7 +56,7 @@ defmodule ElixirRadar do
       |> Floki.find(".job-board-job-title")
       |> parse()
 
-    link =
+    url =
       job
       |> Floki.find(".job-board-job-title")
       |> Floki.attribute("a", "href")
@@ -59,7 +71,7 @@ defmodule ElixirRadar do
       |> Floki.find(".job-board-job-description")
       |> parse()
 
-    %{title: title, location: location, description: description, link: link}
+    %{title: title, location: location, description: description, url: url}
   end
 
   defp parse(text) do
