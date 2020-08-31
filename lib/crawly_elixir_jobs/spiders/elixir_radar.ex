@@ -3,13 +3,9 @@ defmodule ElixirRadar do
 
   @impl Crawly.Spider
   def override_settings() do
-    ui_node = System.get_env("UI_NODE") || "ui@127.0.0.1"
-    ui_node = ui_node |> String.to_atom()
-
     pipelines = [
       {Crawly.Pipelines.Validate, fields: [:title, :location]},
       CrawlyElixirJobs.Pipleline.Filter,
-      {Crawly.Pipelines.Experimental.SendToUI, ui_node: ui_node},
       Crawly.Pipelines.JSONEncoder,
       {Crawly.Pipelines.WriteToFile, folder: "/tmp", extension: "jl"}
     ]

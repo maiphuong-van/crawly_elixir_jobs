@@ -20,11 +20,11 @@ defmodule AmazonDrawing do
 
     middlewares = [
       Crawly.Middlewares.DomainFilter,
-      CrawlyExlirJobs.MiddleWare.AmazonUniqueRequest,
+      CrawlyExlirJobs.MiddleWares.AmazonRequestFilter,
       {Crawly.Middlewares.UserAgent, user_agents: user_agents}
     ]
 
-    [middlewares: middlewares]
+    [concurrent_requests_per_domain: 2, middlewares: middlewares]
   end
 
   @impl Crawly.Spider
@@ -34,15 +34,17 @@ defmodule AmazonDrawing do
   def init() do
     [
       start_urls: [
-        "https://www.amazon.de/s?i=office-products&rh=n%3A192416031%2Cn%3A192417031%2Cn%3A197755031&qid=1598537871&ref=sr_pg_1"
+        "https://www.amazon.de/s?i=office-products&rh=n%3A192416031%2Cn%3A192417031%2Cn%3A197755031&qid=1598537871&ref=sr_pg_1",
+        "https://www.amazon.de/s?k=School+bags%2C+Pencil+Cases+%26+Sets&_encoding=UTF8&c=ts&qid=1598884286&ts_id=360562031&ref=sr_pg_1",
+        "https://www.amazon.de/s?i=office-products&bbn=192416031&rh=n%3A16241186031&brr=1&qid=1598884270&rd=1&ref=sr_pg_1",
+        "https://www.amazon.de/s?k=Teacher+Planning+%26+Management+Resources&_encoding=UTF8&c=ts&qid=1598884317&ts_id=202953031&ref=sr_pg_1",
+        "https://www.amazon.de/s?k=Early+Childhood+Education+Materials&_encoding=UTF8&c=ts&qid=1598884335&ts_id=202948031&ref=sr_pg_1"
       ]
     ]
   end
 
   @impl Crawly.Spider
   def parse_item(response) do
-    IO.inspect("Parsing request: #{response.request.url}")
-
     {:ok, document} = Floki.parse_document(response.body)
 
     page_urls = Floki.find(document, ".a-pagination") |> Floki.attribute("a", "href")

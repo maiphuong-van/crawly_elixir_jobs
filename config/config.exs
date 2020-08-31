@@ -1,24 +1,16 @@
 use Mix.Config
 
-config :erlang_node_discovery,
-  hosts: ["127.0.0.1", "crawlyui.com"],
-  node_ports: [{:ui, 0}]
-
-ui_node = System.get_env("UI_NODE") || "ui@127.0.0.1"
-ui_node = ui_node |> String.to_atom()
+user_agents = Enum.map(1..20, &"Crawly Bot #{&1}")
 
 config :crawly,
   middlewares: [
     Crawly.Middlewares.DomainFilter,
-    Crawly.Middlewares.UniqueRequest,
-    Crawly.Middlewares.RobotsTxt,
-    {Crawly.Middlewares.UserAgent, user_agents: ["Crawly bot 1", "Crawly bot 2"]}
+    CrawlyExlirJobs.MiddleWares.AmazonRequestFilter,
+    {Crawly.Middlewares.UserAgent, user_agents: user_agents}
   ],
-  # fetcher: {Crawly.Fetchers.Splash, [base_url: "http://localhost:8050/render.html"]},
   pipelines: [
     {Crawly.Pipelines.Validate, fields: [:id]},
     {Crawly.Pipelines.DuplicatesFilter, item_id: :id},
-    {Crawly.Pipelines.Experimental.SendToUI, ui_node: ui_node},
     Crawly.Pipelines.JSONEncoder,
     {Crawly.Pipelines.WriteToFile, folder: "/tmp", extension: "jl"}
   ],
